@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Daily Decision Eliminator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-gray-900">
+
+  <h1 class="text-2xl font-bold mb-4">Daily Decision Eliminator</h1>
+
+  <textarea id="optionsInput" rows="4" placeholder="Enter choices, one per line..." 
+    class="w-80 p-2 rounded border border-gray-300 mb-4"></textarea>
+
+  <button onclick="pickChoice()" class="bg-indigo-600 text-white px-4 py-2 rounded">Choose</button>
+
+  <div id="result" class="mt-6 text-lg font-semibold text-center"></div>
+
+  <script>
+    const resultDiv = document.getElementById('result');
+    const savedChoice = localStorage.getItem('dailyChoice');
+    const savedTime = localStorage.getItem('choiceTime');
+
+    if (savedChoice && savedTime) {
+      const then = new Date(savedTime);
+      const now = new Date();
+      const diff = Math.floor((now - then) / (1000 * 60 * 60));
+
+      if (diff < 24) {
+        resultDiv.innerText = `Today's choice is: ${savedChoice}`;
+      } else {
+        localStorage.removeItem('dailyChoice');
+        localStorage.removeItem('choiceTime');
+      }
+    }
+
+    function pickChoice() {
+      if (localStorage.getItem('dailyChoice')) {
+        resultDiv.innerText = `Locked for today: ${localStorage.getItem('dailyChoice')}`;
+        return;
+      }
+
+      const options = document.getElementById('optionsInput').value.trim().split('\n').filter(Boolean);
+      if (options.length === 0) {
+        resultDiv.innerText = 'Please enter at least one option.';
+        return;
+      }
+
+      const choice = options[Math.floor(Math.random() * options.length)];
+      localStorage.setItem('dailyChoice', choice);
+      localStorage.setItem('choiceTime', new Date().toISOString());
+      resultDiv.innerText = `Today's choice is: ${choice}`;
+    }
+  </script>
+
+</body>
+</html>
